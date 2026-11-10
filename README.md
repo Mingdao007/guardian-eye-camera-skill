@@ -37,6 +37,11 @@ done
 
 Ensure that `~/.local/bin/` and Node.js are on your `PATH`. For a remote agent, also install `eye-get` on the other machine.
 
+To make the assistant instructions discoverable as a Codex skill, install the
+`skills/guardian-eye-cameras/` directory under `~/.codex/skills/` using your
+normal skill installation workflow. An already-open conversation may not
+automatically reload changed skill instructions.
+
 Copy `settings.example.json` to `~/.config/guardian-eye/settings.json`. Replace each placeholder with the actual address, the hostname covered by the phone's certificate, and the paths of the exported certificate and credentials file. Set the Chrome path for your operating system. Create the credentials files with a private editor or an operating-system credential tool; do not put passwords in shell history. Restrict each credentials file to its owner, for example with `chmod 600`. Never commit the filled settings, credentials, certificates, screenshots, or camera URLs to a public repository.
 
 The user-facing `eye` command keeps the private browser session alive until the page is closed. Its localhost URL is temporary; open it by running `eye`, rather than by bookmarking the URL. `eye-13p` works independently. If one configured camera is unreachable, the other can still open. The page shows an unavailable placeholder for a missing camera.
