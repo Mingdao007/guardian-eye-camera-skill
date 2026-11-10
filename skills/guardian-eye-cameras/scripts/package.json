@@ -1,0 +1,8 @@
+{
+  "name": "guardian-eye-camera-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local low-latency Guardian Eye viewer",
+  "dependencies": {"playwright-core": "1.58.2"},
+  "engines": {"node": ">=20"}
+}

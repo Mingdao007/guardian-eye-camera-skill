@@ -1,0 +1,7 @@
+node_modules/
+*.jpg
+*.jpeg
+*.png
+*.cer
+*.pem
+*credentials*.json

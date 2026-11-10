@@ -1,0 +1,19 @@
+{
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "cameras": {
+    "13p": {
+      "label": "iPhone 13 Pro",
+      "address": "<LAN_ADDRESS_OF_13_PRO>",
+      "hostname": "<CERTIFICATE_HOSTNAME_OF_13_PRO>",
+      "certificate": "~/.config/guardian-eye/13p-certificate.cer",
+      "credentials": "~/.config/guardian-eye/13p-credentials.json"
+    },
+    "x": {
+      "label": "iPhone X",
+      "address": "<LAN_ADDRESS_OF_IPHONE_X>",
+      "hostname": "<CERTIFICATE_HOSTNAME_OF_IPHONE_X>",
+      "certificate": "~/.config/guardian-eye/x-certificate.cer",
+      "credentials": "~/.config/guardian-eye/x-credentials.json"
+    }
+  }
+}

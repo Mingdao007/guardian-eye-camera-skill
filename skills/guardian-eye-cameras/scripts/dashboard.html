@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="guardian-token" content="GUARDIAN_LOCAL_TOKEN">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guardian Eye cameras</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: #07111c; color: #edf8ff; font: 16px system-ui, sans-serif; }
+    main { display: flex; height: 100%; gap: 4px; }
+    section { flex: 1; min-width: 0; position: relative; background: #111d2a; }
+    section.hidden { display: none; }
+    .status { position: absolute; inset: 0; display: grid; place-items: center; color: #b4c7d6; }
+    .toolbar { position: absolute; top: 10px; right: 10px; z-index: 1; display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 7px; background: #07111cee; color: #b8d9e7; font-size: 12px; }
+    .toolbar strong { color: #7be5ff; padding: 0 4px; }
+    .toolbar button { color: #edf8ff; border: 1px solid #527385; border-radius: 4px; background: #203848; padding: 4px 7px; cursor: pointer; }
+    .toolbar button[aria-pressed="true"] { background: #007ea4; border-color: #33d8ff; }
+    .toolbar button:disabled { opacity: .35; cursor: not-allowed; }
+    .sourcebar { top: 50px; }
+    iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; }
+    iframe:not([src]) { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <section id="pane-13p">
+      <div class="status">iPhone 13 Pro: unavailable</div><iframe id="camera-13p" title="iPhone 13 Pro" allow="autoplay; fullscreen"></iframe>
+      <div class="toolbar" title="仅放大这个页面的画面，不改变手机镜头或其他观看端"><strong>13 Pro</strong><span>显示放大</span><button data-camera="13p" data-zoom="1" aria-pressed="true">1×</button><button data-camera="13p" data-zoom="2" aria-pressed="false">2×</button><button data-camera="13p" data-zoom="4" aria-pressed="false">4×</button></div>
+      <div class="toolbar sourcebar" title="手机端数码变焦会影响所有观看端，不代表光学镜头切换"><span>手机数码变焦</span><button data-source-camera="13p" data-source-zoom="1" disabled>1×</button><button data-source-camera="13p" data-source-zoom="2" disabled>≈2×</button><button data-source-camera="13p" data-source-zoom="4" disabled>≈4×</button><span id="source-status-13p">未标定</span></div>
+    </section>
+    <section id="pane-x">
+      <div class="status">iPhone X: unavailable</div><iframe id="camera-x" title="iPhone X" allow="autoplay; fullscreen"></iframe>
+      <div class="toolbar" title="仅放大这个页面的画面，不改变手机镜头或其他观看端"><strong>iPhone X</strong><span>显示放大</span><button data-camera="x" data-zoom="1" aria-pressed="true">1×</button><button data-camera="x" data-zoom="2" aria-pressed="false">2×</button><button data-camera="x" data-zoom="4" aria-pressed="false">4×</button></div>
+      <div class="toolbar sourcebar" title="手机端数码变焦会影响所有观看端，不代表光学镜头切换"><span>手机数码变焦</span><button data-source-camera="x" data-source-zoom="1" disabled>1×</button><button data-source-camera="x" data-source-zoom="2" disabled>≈2×</button><button data-source-camera="x" data-source-zoom="4" disabled>≈4×</button><span id="source-status-x">未标定</span></div>
+    </section>
+  </main>
+  <script>
+    for (const iframe of document.querySelectorAll('iframe')) iframe.addEventListener('load', () => {
+      const name = iframe.id.replace('camera-', ''), selected = document.querySelector(`button[data-camera="${name}"][aria-pressed="true"]`);
+      if (iframe.dataset.origin && selected) iframe.contentWindow.postMessage({type:'guardian-display-zoom', value:Number(selected.dataset.zoom)}, iframe.dataset.origin);
+    });
+    document.addEventListener('click', event => {
+      const button = event.target.closest('button[data-camera][data-zoom]');
+      if (!button) return;
+      const name = button.dataset.camera, iframe = document.getElementById(`camera-${name}`);
+      if (!iframe.dataset.origin) return;
+      iframe.contentWindow.postMessage({type:'guardian-display-zoom', value:Number(button.dataset.zoom)}, iframe.dataset.origin);
+      for (const other of document.querySelectorAll(`button[data-camera="${name}"]`)) other.setAttribute('aria-pressed', String(other === button));
+    });
+    document.addEventListener('click', async event => {
+      const button = event.target.closest('button[data-source-camera][data-source-zoom]');
+      if (!button || button.disabled) return;
+      const name = button.dataset.sourceCamera, factor = Number(button.dataset.sourceZoom), status = document.getElementById(`source-status-${name}`);
+      button.disabled = true; status.textContent = '设置中';
+      try {
+        const response = await fetch('/zoom', {method:'POST', headers:{'Content-Type':'application/json', 'X-Guardian-Token':document.querySelector('meta[name="guardian-token"]').content}, body:JSON.stringify({camera:name, factor})});
+        if (!response.ok || !(await response.json()).ok) throw new Error('Zoom failed');
+        status.textContent = `已设${factor === 1 ? '' : '≈'}${factor}×`;
+      } catch (_) { status.textContent = '设置未确认'; }
+      finally { button.disabled = false; }
+    });
+  </script>
+</body>
+</html>

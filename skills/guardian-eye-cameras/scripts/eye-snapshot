@@ -1,0 +1,2 @@
+#!/bin/sh
+exec node "${GUARDIAN_EYE_HOME:-$HOME/.local/share/guardian-eye}/eye-snapshot.cjs" "$@"

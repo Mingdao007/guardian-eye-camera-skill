@@ -1,0 +1,17 @@
+#!/bin/sh
+# Read a frame from an existing viewer on a trusted SSH host.
+set -eu
+camera=${1:-}
+case "$camera" in 13p|x) ;; *) echo 'Usage: eye-get 13p|x' >&2; exit 2;; esac
+if [ -z "${GUARDIAN_EYE_SSH_HOST:-}" ]; then
+  echo 'Set GUARDIAN_EYE_SSH_HOST to the viewer host.' >&2
+  exit 2
+fi
+umask 077
+image=$(mktemp "${TMPDIR:-/tmp}/guardian-eye-${camera}-XXXXXX.jpg")
+if ssh -T -o BatchMode=yes -o ConnectTimeout=5 "$GUARDIAN_EYE_SSH_HOST" "\$HOME/.local/bin/eye-snapshot $camera --stdout" > "$image"; then
+  printf '%s\n' "$image"
+else
+  rm -f "$image"
+  exit 1
+fi
